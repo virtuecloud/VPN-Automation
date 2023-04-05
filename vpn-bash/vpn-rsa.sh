@@ -1,5 +1,5 @@
 #!/bin/bash
-servername=manthanserver           #Can be changed according to user requirement
+servername=example-server           #Can be changed according to user requirement
 if (($# >= 3)); 
 then    
     DIR="$( cd "$( dirname "$0" )" && pwd )"
