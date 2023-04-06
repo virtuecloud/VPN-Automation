@@ -6,7 +6,7 @@ Server Name is set to "server" by Default. If you want to change serve name it c
 ```
 ./vpn-bash/vpn-rsa.sh example-clientname.com init terraform
 ```
-Note : The above command is specifically for users who want to create clientvpn endpoint also. All Other Command which will help to ADD or DELETE VPN User to or from Exsisting ClientVPN Endpoint are mentioned at last of this file
+Note : The above command is specifically for users who want to create clientvpn endpoint also. All Other Command which will help to ADD or DELETE VPN User to or from Existing ClientVPN Endpoint are mentioned at last of this file
 - Explaination : 
  - At Argument 0 - We are trying to run bash script inside vpn_bash folder
  - At Argument 1 - We are giving clientname which user has to input for ADD/DELTE Option
