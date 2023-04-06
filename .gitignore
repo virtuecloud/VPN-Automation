@@ -40,3 +40,4 @@ server_arn
 client_name
 *.ovpn
 .DS_Store
+values.auto.tfvars
