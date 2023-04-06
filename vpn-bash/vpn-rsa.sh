@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+shopt -s nocasematch
 servername=vpn-server           #Can be changed according to user requirement
 if (($# >= 3)); 
 then    
@@ -7,9 +8,9 @@ then
     echo $DIR
     #ServerFile Creation
     cd $DIR
-    if aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $servername;
+    if aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $servername;
     then
-        # aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $servername | cut -f1 > server_arn
+        # aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $servername | cut -f1 > server_arn
         echo "Server Certificate Already Uploaded to ACM"
         git clone https://github.com/OpenVPN/easy-rsa.git || true
     else
@@ -28,7 +29,7 @@ then
     fi
 
     if [[ $2 == "INIT" ]]; then
-        if aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $1;
+        if aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $1;
         then 
             echo "Client with same name already exists on ACM"
         else
@@ -41,7 +42,7 @@ then
     #Client ADD or DELETE
     
     elif [[ $2 == "ADD" ]] && [[ $3 != "terraform" ]]; then
-        if aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $1;
+        if aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $1;
         then 
             echo "Client with same name already exists on ACM"
             exit 1
@@ -52,10 +53,10 @@ then
             aws acm import-certificate --certificate fileb://acm/$1.crt --private-key fileb://acm/$1.key --certificate-chain fileb://acm/ca.crt && echo -e "\nUser added"
         fi
     elif [[ $2 == "DELETE" ]]; then
-        if aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $1;
+        if aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $1;
         then
             ./easy-rsa/easyrsa3/easyrsa revoke $1
-            arn_to_delete=$(aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $1 | cut -f1)
+            arn_to_delete=$(aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $1 | cut -f1)
             aws acm delete-certificate --certificate-arn $arn_to_delete && echo -e "\nUser deleted"
             ./easy-rsa/easyrsa3/easyrsa gen-crl
         else
@@ -68,14 +69,14 @@ then
 
     cd ..
 
-    aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $servername | cut -f1 > server_arn
+    aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $servername | cut -f1 > server_arn
     truncate -s-1 server_arn
-    aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $1 | cut -f1 > client_arn
+    aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $1 | cut -f1 > client_arn
     truncate -s-1 client_arn
 
     endpoint=$(aws ec2 describe-client-vpn-endpoints --query 'ClientVpnEndpoints[?not_null(Tags[?Value == `'$3'`].Value)].ClientVpnEndpointId' --output text)
     if [[ $3 == "terraform" ]]; then
-        aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep $1 | cut -f2 > client_name
+        aws acm list-certificates --query 'CertificateSummaryList[].[CertificateArn,DomainName]'   --output text | grep -w $1 | cut -f2 > client_name
         truncate -s-1 client_name
         terraform init
         terraform plan
